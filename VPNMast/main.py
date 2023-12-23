@@ -1,19 +1,38 @@
+import config
+import socket
 from vpn import vpn
 from user import user as us
+import threading
+from Proto.udp import UDP
+
 def help():
     print("help:Show the commands")
+    print("start <direccion> <puerto>: Start the VPN with the specified address and port")
+    print("stop: Stop the VPN")
     print("create_user <user> <password> <id_vlan>: Create a new user")
     print("remove_user <id>: Remove a user")
     print("get_user <id>: Get a user")
     print("get_users: Get all users")
 
-
+thread=None
 print("Runing...\n")
 while True:
     command = input("vpn> ")
     command = command.split(" ")
     if command[0] == "help":
         help()
+    elif command[0] == "start":
+        if thread is not None:
+            print("VPN already started\n")
+            continue
+        # Iniciar la VPN con la dirección y el puerto ingresados
+        conection= UDP(config.IP, config.PORT)
+        try:
+            thread = threading.Thread(target=conection.run)
+            thread.start()
+        except :
+            print('Fatal error')
+            continue
     elif command[0] == "create_user":
         try:
             user_name = command[1]

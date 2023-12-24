@@ -5,6 +5,14 @@ from user import user as us
 import threading
 from Proto.udp import UDP
 
+def run_generator():
+    gen = conection.run()
+    try:
+        while True:
+            next(gen)
+    except StopIteration:
+        pass
+
 def help():
     print("help:Show the commands")
     print("start <direccion> <puerto>: Start the VPN with the specified address and port")
@@ -28,7 +36,7 @@ while True:
         # Iniciar la VPN con la dirección y el puerto ingresados
         conection= UDP(config.IP, config.PORT)
         try:
-            thread = threading.Thread(target=conection.run)
+            thread = threading.Thread(target=run_generator())
             thread.start()
         except :
             print('Fatal error')

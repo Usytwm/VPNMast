@@ -1,5 +1,7 @@
 import socket
 import struct
+from ipaddress import ip_address
+import os
 
 class UDP():
     def __init__(self, ip, port):
@@ -7,56 +9,89 @@ class UDP():
         self._port = port
         self.__stop = False
 
+        # self.__connection = socket.socket(socket.AF_INET,  socket.SOCK_RAW, socket.IPPROTO_UDP)
         self.__connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__connection.bind((self._ip, self._port))
-        self.__connection.setblocking(False)
 
+        self.__connection.bind((self._ip, self._port))
+        
+
+    def parse_udp(self, data):
+        src_port, dst_port = struct.unpack('>HH', data[:4])
+        return src_port, dst_port, data[8:]
+
+    def parse_ipv4(self, data):
+        ihl = data[0]&0x0f
+        length = int.from_bytes(data[2:4], 'big')
+        proto = data[9]
+        src_ip = ip_address(data[12:16])
+        dst_ip = ip_address(data[16:20])
+        body = data[ihl<<2:length]
+        return proto, src_ip, dst_ip, body
+    
+    def make_udp(self, src_port, dst_port, body):
+        udp_data = struct.pack('>HHHH', src_port, dst_port, len(body)+8, 0) + body
+        checksum = self.checksum(udp_data)
+        return struct.pack('>HHHH', src_port, dst_port, len(body)+8, checksum) + body
+
+    def make_ipv4(self, proto, src_ip, dst_ip, body):
+        ip_header = bytearray(struct.pack('>BxH2s2xBB2x4s4s', 0x45, len(body)+20, os.urandom(2), 64,
+            proto, ip_address(src_ip).packed, ip_address(dst_ip).packed))
+        checksum = self.checksum(ip_header + body)
+        ip_header[10:12] = checksum.to_bytes(2, 'big')  # Convierte el checksum en una secuencia de bytes
+        return bytes(ip_header + body)
+    
+    
     def send(self, data, dest_addr):
         dest_ip, dest_port = dest_addr
         dest_ip = '127.0.0.1' if dest_ip == 'localhost' else dest_ip
 
         data = data.encode('utf-8')
 
-        length = 8 + len(data)
-        checksum = 0
+        udp_data = self.make_udp(self._port, dest_port, data)
 
-        udp_data = struct.pack("!HHHH", self._port, dest_port, length, checksum) + data
-
-        checksum = self.checksum(udp_data)
-        udp_header = struct.pack('!HHHH', self._port, dest_port, length, checksum)
-
-        self.__connection.sendto(udp_header + data, (dest_ip, dest_port))
+        ip_data = self.make_ipv4(socket.IPPROTO_UDP, self._ip, dest_ip, udp_data)
+       
+        self.__connection.sendto(ip_data, (dest_ip, dest_port))
 
         print(f'UDP data sent to {dest_ip}:{dest_port}\n')
 
     def run(self):
+        # print('server iniciado')
         while not self.__stop:
             try:
                 data, src_addr = self.__connection.recvfrom(1024)
-
-                udp_header = data[:8]
-                udp_header = struct.unpack('!HHHH', udp_header)
-
-                src_port, dest_port, length, checksum = udp_header
+                proto, src_ip, dst_ip, ip_data = self.parse_ipv4(data)
+                
+                if proto != socket.IPPROTO_UDP:
+                    continue
+            
+                src_port, dest_port, udp_data = self.parse_udp(ip_data)
 
                 if dest_port != self._port:
                     continue
 
                 sender_ip, _ = src_addr
 
-                zero_checksum_header = data[:6] + b'\x00\x00' + data[8:]
-                calculated_checksum = checksum( zero_checksum_header + data[8:])
+                
+                # Extrae el checksum del encabezado UDP
+                received_checksum = struct.unpack('>H', ip_data[6:8])[0]
 
-                print(f'UDP data received from {sender_ip}:{dest_port}')
+                # Crea un encabezado UDP con el checksum establecido en 0
+                zero_checksum_header = ip_data[:6] + b'\x00\x00' + ip_data[8:]
 
-                if checksum != calculated_checksum:
-                    print('Corrupted data\n')
+                # Calcula el checksum
+                calculated_checksum = self.checksum(zero_checksum_header)
+
+                print(f'UDP data received from {sender_ip}:{src_port}')
+                
+                if received_checksum != calculated_checksum:
+                   print('Corrupted data\n')
                 else:
-                    data = data[8:].decode('utf-8')
-                    print(f'Data: {data}')
-                    print(f'Length: {length}, Checksum: {checksum}\n')
+                    data = udp_data.decode('utf-8')
+                    print(f'Data: {data}\n')
 
-                    yield data
+                yield data
+                
             except BlockingIOError:
                 continue
 
@@ -69,4 +104,73 @@ class UDP():
         while x > 0xffff:
             x = (x>>16)+(x&0xffff)
         x = 65535 - x
-        return x.to_bytes(2, 'big')
+        return x
+
+
+# import socket
+# import struct
+# import os
+# from ipaddress import ip_address
+
+# class UDP():
+#     def __init__(self, ip, port):
+#         self._ip = '127.0.0.1' if ip == 'localhost' else ip
+#         self._port = port
+#         self.__stop = False
+
+#         self.__connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         self.__connection.bind((self._ip, self._port))
+#         self.__connection.setblocking(False)
+  
+#     def send(self, data, dest_addr):
+#         dest_ip, dest_port = dest_addr
+#         dest_ip = '127.0.0.1' if dest_ip == 'localhost' else dest_ip
+
+#         data = data.encode('utf-8')
+
+#         udp_data = self.make_udp(self._port, dest_port, data)
+
+#         checksum = self.checksum(udp_data)
+#         udp_data = struct.pack('>HHHH', self._port, dest_port, len(data)+8, checksum) + data
+
+#         ip_data = self.make_ipv4(socket.IPPROTO_UDP, self._ip, dest_ip, udp_data)
+
+#         self.__connection.sendto(ip_data, (dest_ip, dest_port))
+
+#         print(f'UDP data sent to {dest_ip}:{dest_port}\n')
+
+#     def run(self):
+#         while not self.__stop:
+#             try:
+#                 data, src_addr = self.__connection.recvfrom(1024)
+
+#                 proto, src_ip, dst_ip, ip_data = self.parse_ipv4(data)
+
+#                 if proto != socket.IPPROTO_UDP:
+#                     continue
+
+#                 src_port, dest_port, udp_data = self.parse_udp(ip_data)
+
+#                 if dest_port != self._port:
+#                     continue
+
+#                 sender_ip, _ = src_addr
+
+#                 print(f'UDP data received from {sender_ip}:{dest_port}')
+
+#                 data = udp_data.decode('utf-8')
+#                 print(f'Data: {data}\n')
+
+#             except BlockingIOError:
+#                 continue
+
+#     def stop(self):
+#         self.__stop = True
+
+#     @staticmethod
+#     def checksum(data):
+#         x = sum(struct.unpack(f'>{len(data)//2}H', data))
+#         while x > 0xffff:
+#             x = (x>>16)+(x&0xffff)
+#         x = 65535 - x
+#         return x.to_bytes(2, 'big')

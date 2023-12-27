@@ -50,8 +50,6 @@ class vpn(user_crud_interface):
     
     def send(self,body:Body):
         self.proto.send(body.data, (body.dest_ip, body.dest_port))
-        
-            
     
     def show_users(self):
         for user in self.users:

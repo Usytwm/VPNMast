@@ -100,11 +100,23 @@ class UDP():
 
     @staticmethod
     def checksum(data):
-        x = sum(struct.unpack(f'>{len(data)//2}H', data))
-        while x > 0xffff:
-            x = (x>>16)+(x&0xffff)
-        x = 65535 - x
-        return x
+        checksum = 0
+        for i in range(0, len(data), 2):
+            if i + 1 < len(data):
+                checksum += (data[i] << 8) + data[i+1]
+            else:
+                checksum += data[i]
+            while checksum >> 16:
+                checksum = (checksum & 0xFFFF) + (checksum >> 16)
+
+        checksum = ~checksum
+
+        return checksum & 0xFFFF
+        # x = sum(struct.unpack(f'>{len(data)//2}H', data))
+        # while x > 0xffff:
+        #     x = (x>>16)+(x&0xffff)
+        # x = 65535 - x
+        # return x
 
 
 # import socket

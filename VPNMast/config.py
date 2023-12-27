@@ -3,6 +3,3 @@ IP = "localhost"
 
 # Asignar el puerto a la variable port
 PORT = 8010
-
-# Usar las variables en tu código
-# ...

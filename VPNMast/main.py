@@ -5,8 +5,8 @@ from user import user as us
 import threading
 from Proto.udp import UDP
 
-def run_generator():
-    gen = conection.run()
+def run_generator(vpn:vpn):
+    gen = vpn.run()
     try:
         while True:
             next(gen)
@@ -23,6 +23,7 @@ def help():
     print("get_users: Get all users")
 
 thread=None
+print('Welcome to VPNMast')
 print("Runing...\n")
 while True:
     command = input("vpn> ")
@@ -34,12 +35,13 @@ while True:
             print("VPN already started\n")
             continue
         # Iniciar la VPN con la dirección y el puerto ingresados
-        conection= UDP(config.IP, config.PORT)
+        proto = UDP(config.IP, config.PORT)
+        conection = vpn(proto=proto)
         try:
-            thread = threading.Thread(target=run_generator())
+            thread = threading.Thread(target=run_generator(conection))
             thread.start()
-        except :
-            print('Fatal error')
+        except Exception as e :
+            print(e)
             continue
     elif command[0] == "create_user":
         try:

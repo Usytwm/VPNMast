@@ -1,13 +1,15 @@
 import json
+from core import Body
 from user import user
 from user_crud import user_crud_interface
 import utils
+from Proto.udp import UDP
 
 class vpn(user_crud_interface):
-    def __init__ (self) -> None:
+   
+    def __init__ (self,proto:UDP) -> None:
         self.users = utils.get_users()
-        pass
-    pass
+        self.proto=proto
 
     def create_user(self, new_user:user):
         if not any(user == new_user for user in self.users):
@@ -17,7 +19,6 @@ class vpn(user_crud_interface):
             print(f"User {new_user.name} created")
         else:
             print(f"User {new_user.name} already exists")  
-
 
     def delete_user(self, id:int):
         if any(user.id == id for user in self.users):
@@ -38,6 +39,20 @@ class vpn(user_crud_interface):
         json.dump(self.users,  file, default=lambda o: o.__dict__)
         file.close()
     
+    def run(self):
+        for i in self.proto.run():
+            try:
+                body = Body.dict_to_body(json.loads(i))
+                self.send(body)
+            except Exception as e:
+                print(e)
+                continue
+    
+    def send(self,body:Body):
+        self.proto.send(body.data, (body.dest_ip, body.dest_port))
+        
+            
+    
     def show_users(self):
         for user in self.users:
             print(f"User: {user.name}")
@@ -45,7 +60,6 @@ class vpn(user_crud_interface):
             print(f"Id: {user.id}")
             print("----------------------------------")
 
-vpn = vpn()
 
 # user1 = user("a", "a", 1)
 # vpn.create_user(user1)
@@ -60,4 +74,4 @@ vpn = vpn()
 # vpn.create_user(user4)
 # user5 = user("e", "e", 5)
 # vpn.create_user(user5)
-vpn.delete_user(0)
+#vpn.delete_user(0)

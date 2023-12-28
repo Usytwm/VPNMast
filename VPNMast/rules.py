@@ -1,5 +1,5 @@
 from rule import rule
-from user import user as vpn_user
+from User.user import user as vpn_user
 from core import Body as vpn_body
 
 

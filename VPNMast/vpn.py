@@ -1,8 +1,8 @@
 import json
 from core import Body
-from user import user
+from User.user import user
 from rule import rule
-from user_crud import user_crud_interface
+from CRUDs.user_crud import user_crud_interface
 from rule_crud import rule_crud_interface 
 import utils
 from Proto.udp import UDP

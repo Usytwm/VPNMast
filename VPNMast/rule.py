@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from user import user 
+from User.user import user 
 from core import Body 
 
 class rule(ABC):

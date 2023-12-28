@@ -1,7 +1,7 @@
 import config
 import socket
 from vpn import vpn
-from user import user as us
+from User.user import user as us
 from rules import regulation_User, regulation_VLAN
 import threading
 from Proto.udp import UDP
@@ -13,7 +13,9 @@ def run_generator(vpn:vpn):
             next(gen)
     except StopIteration:
         pass
-
+# Iniciar la VPN con la dirección y el puerto ingresados
+proto = UDP(config.IP, config.PORT)
+_vpn = vpn(proto=proto)
 def help():
     print("help:Show the commands")
     print("start <direccion> <puerto>: Start the VPN with the specified address and port")
@@ -35,35 +37,32 @@ while True:
         if thread is not None:
             print("VPN already started\n")
             continue
-        # Iniciar la VPN con la dirección y el puerto ingresados
-        proto = UDP(config.IP, config.PORT)
-        conection = vpn(proto=proto)
         try:
-            thread = threading.Thread(target=run_generator(conection))
+            thread = threading.Thread(target=run_generator(_vpn))
             thread.start()
         except Exception as e :
             print(e)
             continue
     elif command[0] == "create_user":
-        try:
+        try: 
             user_name = command[1]
             user_password = command[2]
             user_vlan = command[3]
             new_user = us(user_name, user_password, user_vlan)
-            vpn.create_user(new_user)
+            _vpn.create_user(new_user)
         except:
             print("Invalid arguments")
 
     elif command[0] == "remove_user":
         try:
             user_id = int(command[1])
-            vpn.delete_user(user_id)
+            _vpn.delete_user(user_id)
         except:
             print("Invalid arguments")
         
     elif command[0] == "get_users":
         try:
-            vpn.show_users()
+           _vpn.show_users()
             
         except:
             print("Invalid arguments")

@@ -2,6 +2,7 @@ import config
 import socket
 from vpn import vpn
 from user import user as us
+from rules import regulation_User, regulation_VLAN
 import threading
 from Proto.udp import UDP
 
@@ -68,6 +69,30 @@ while True:
             print("Invalid arguments")
     elif command[0] == "exit":
         break
+    
+    elif command[0] == "regulation_vlan":
+        try:
+            rule_name = command[1]
+            id_vlan = int(command[2])
+            dest_ip = command[3]
+            dest_port = int(command[4])
+            new_rule = regulation_VLAN(rule_name,dest_ip, dest_port, id_vlan)
+            vpn.create_rule(new_rule)
+        except:
+            print("Invalid arguments")
+
+    elif command[0] == "regulation_user":
+        try:
+            rule_name = command[1]
+            id_user = int(command[2])
+            dest_ip = command[3]
+            dest_port = int(command[4])
+            new_rule = regulation_User(rule_name,dest_ip, dest_port, id_user)
+            vpn.create_rule(new_rule)
+        except:
+            print("Invalid arguments")
+    
+    
     else:
         print("Command not found\n")
         help()

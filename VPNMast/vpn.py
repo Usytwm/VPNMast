@@ -1,14 +1,17 @@
 import json
 from core import Body
 from user import user
+from rule import rule
 from user_crud import user_crud_interface
+from rule_crud import rule_crud_interface 
 import utils
 from Proto.udp import UDP
 
-class vpn(user_crud_interface):
+class vpn(user_crud_interface, rule_crud_interface):
    
     def __init__ (self,proto:UDP) -> None:
         self.users = utils.get_users()
+        self.rules = utils.get_rules()
         self.proto=proto
 
     def create_user(self, new_user:user):
@@ -59,15 +62,59 @@ class vpn(user_crud_interface):
             print(f"Password: {user.pwd}")
             print(f"Id: {user.id}")
             print("----------------------------------")
+    
+    def create_rule(self, new_rule: rule):
+        if not any(user == new_user for user in self.rules):
+            new_rule.id = len(self.rules)
+            self.rules.append(new_rule)
+            self.save_rules()
+            print(f"Rule {new_rule.name} created")
+        else:
+            print(f"Rule {new_rule.name} already exists")  
+    
+    def delete_rule(self, id: int):
+        if any(rule.id == id for rule in self.rules):
+            rule = self.rules[id]
+            rule_name = rule.name
+            self.rules.remove(rule)
+            if not len(self.rules)==0:
+                 for i, rule in enumerate(self.rules):
+                    rule.id = i
+            self.save_rules()
+            print(f"Rule {rule_name} deleted")
+        else:  
+            print(f"Rule not found")
 
+    def save_rules(self):
+        path = 'rules.json'
+        file = open(path, 'w+')
+        json.dump(self.rules,  file, default=lambda o: {
+            'name': o.name,
+            'category': o.category,
+            'ip': o.ip,
+            'port': o.port,
+            'e_id': o.e_id
+        })
+        file.close()
 
-# user1 = user("a", "a", 1)
-# vpn.create_user(user1)
+    def show_rules(self):
+        for rule in self.rules:
+            category = 'VLAN Regulation' if i.category == 0 else 'User Regulation'
+            e_id = f'id_vlan: {i.e_id}' if i.category == 0 else f'user_id: {i.e_id}'
+            print(f"Rule: {rule.name}")
+            print(f"Type: {category} {e_id}")
+            print(f"Ip: {rule.ip}")
+            print(f"Ip: {rule.port}")
+            print("----------------------------------")
+    
+# vpn = vpn()
+#user1 = user("a", "a", 1)
+#vpn.create_user(user1)
 # user2 = user("b", "b", 2)
 # vpn.create_user(user2)
 # vpn.show_users()
 # user2 = user("b", "b", 2)
-# vpn.create_user(user2)
+# vpn.create_user(user2)s
 # user3 = user("c", "c", 3)
 # vpn.create_user(user3)
 # user4 = user("d", "d", 4)

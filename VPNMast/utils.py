@@ -1,7 +1,8 @@
 import os
 import json
 from User.user import user as us
-#from rule import ruler as ru
+from Rule.rule import rule as ru
+
 
 def get_users():
     path: str = 'users.json'

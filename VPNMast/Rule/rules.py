@@ -1,4 +1,4 @@
-from rule import rule
+from Rule.rule import rule
 from User.user import user as vpn_user
 from core import Body as vpn_body
 

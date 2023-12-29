@@ -1,8 +1,9 @@
 import config
 import socket
 from vpn import vpn
+from Rule.rule import rule as ru
 from User.user import user as us
-from rules import regulation_User, regulation_VLAN
+from Rule.rules import regulation_User, regulation_VLAN
 import threading
 from Proto.udp import UDP
 
@@ -24,6 +25,11 @@ def help():
     print("remove_user <id>: Remove a user")
     print("get_user <id>: Get a user")
     print("get_users: Get all users")
+    print("regulation_vlan <rule_name> <id_vlan> <dest_ip> <dest_port>: Restrict a vlan")
+    print("regulation_user <rule_name> <id_user> <dest_ip> <dest_port>: Restrict a user")
+    print("remove_rule <id>: Remove a rule")
+    print("get_rules: Get all rules")
+    
 
 thread=None
 print('Welcome to VPNMast')
@@ -66,9 +72,10 @@ while True:
             
         except:
             print("Invalid arguments")
+
     elif command[0] == "exit":
         break
-    
+
     elif command[0] == "regulation_vlan":
         try:
             rule_name = command[1]
@@ -76,7 +83,7 @@ while True:
             dest_ip = command[3]
             dest_port = int(command[4])
             new_rule = regulation_VLAN(rule_name,dest_ip, dest_port, id_vlan)
-            vpn.create_rule(new_rule)
+            _vpn.create_rule(new_rule)
         except:
             print("Invalid arguments")
 
@@ -87,12 +94,22 @@ while True:
             dest_ip = command[3]
             dest_port = int(command[4])
             new_rule = regulation_User(rule_name,dest_ip, dest_port, id_user)
-            vpn.create_rule(new_rule)
+            _vpn.create_rule(new_rule)
         except:
             print("Invalid arguments")
     
+    elif command[0] == "get_rules":
+        _vpn.show_rules()
+            
+       
+
+    elif command[0] == "remove_rule":
+        rule_id = int(command[1])
+        _vpn.delete_rule(rule_id)
     
+
     else:
         print("Command not found\n")
         help()
     pass
+    

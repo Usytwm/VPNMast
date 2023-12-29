@@ -1,9 +1,9 @@
 import json
 from core import Body
 from User.user import user
-from rule import rule
+from Rule.rule import rule
 from CRUDs.user_crud import user_crud_interface
-from rule_crud import rule_crud_interface 
+from CRUDs.rule_crud import rule_crud_interface 
 import utils
 from Proto.udp import UDP
 
@@ -62,7 +62,7 @@ class vpn(user_crud_interface, rule_crud_interface):
             print("----------------------------------")
     
     def create_rule(self, new_rule: rule):
-        if not any(user == new_user for user in self.rules):
+        if not any(rule == new_rule for rule in self.rules):
             new_rule.id = len(self.rules)
             self.rules.append(new_rule)
             self.save_rules()
@@ -96,13 +96,15 @@ class vpn(user_crud_interface, rule_crud_interface):
         file.close()
 
     def show_rules(self):
+        #print("Hi")
         for rule in self.rules:
-            category = 'VLAN Regulation' if i.category == 0 else 'User Regulation'
-            e_id = f'id_vlan: {i.e_id}' if i.category == 0 else f'user_id: {i.e_id}'
+            #print("Hik")
+            category = 'VLAN Regulation' if rule.category == 0 else 'User Regulation'
+            e_id = f'id_vlan: {rule.e_id}' if rule.category == 0 else f'user_id: {rule.e_id}'
             print(f"Rule: {rule.name}")
             print(f"Type: {category} {e_id}")
             print(f"Ip: {rule.ip}")
-            print(f"Ip: {rule.port}")
+            print(f"Port: {rule.port}")
             print("----------------------------------")
     
 # vpn = vpn()

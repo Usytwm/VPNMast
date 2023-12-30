@@ -2,12 +2,11 @@ import socket
 from udp import UDP
 from utils import parse_ipv4, parse_udp, get_user
 from core import Body
-
 import config
 import json
 
 client = UDP(config.IP, 5001)
-client = UDP(config.IP, 5001)
+
 user = input("user: ")
 password = input("password: ")
 if not get_user(user, password) == None:

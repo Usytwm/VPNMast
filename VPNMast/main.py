@@ -31,7 +31,6 @@ def help():
     print("stop: Stop the VPN")
     print("create_user <user> <password> <id_vlan>: Create a new user")
     print("remove_user <id>: Remove a user")
-    print("get_user <id>: Get a user")
     print("get_users: Get all users")
     print(
         "regulation_vlan <rule_name> <id_vlan> <dest_ip> <dest_port>: Restrict a vlan"
@@ -121,4 +120,5 @@ while True:
 
     else:
         print("Command not found\n")
+        help()
         help()

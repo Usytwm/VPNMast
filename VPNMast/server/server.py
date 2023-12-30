@@ -1,4 +1,4 @@
-from Proto.udp import UDP
+from ..Proto.udp import UDP
 import sys
 
 port = int(input("port: "))

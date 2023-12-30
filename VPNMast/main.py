@@ -14,6 +14,7 @@ def run_generator(vpn:vpn):
             next(gen)
     except StopIteration:
         pass
+    
 # Iniciar la VPN con la dirección y el puerto ingresados
 proto = UDP(config.IP, config.PORT)
 _vpn = vpn(proto=proto)
@@ -23,7 +24,6 @@ def help():
     print("stop: Stop the VPN")
     print("create_user <user> <password> <id_vlan>: Create a new user")
     print("remove_user <id>: Remove a user")
-    print("get_user <id>: Get a user")
     print("get_users: Get all users")
     print("regulation_vlan <rule_name> <id_vlan> <dest_ip> <dest_port>: Restrict a vlan")
     print("regulation_user <rule_name> <id_user> <dest_ip> <dest_port>: Restrict a user")

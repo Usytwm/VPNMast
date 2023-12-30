@@ -5,7 +5,7 @@ import config
 import json
 import sys
 
-client =UDP(config.IP, 5001)
+client = UDP(config.IP, 5001)
 user = input("user: ")
 password = input("password: ")
 if not utils.get_user(user, password)==None:
@@ -19,7 +19,7 @@ if not utils.get_user(user, password)==None:
         body = json.dumps(body, default=lambda o: o.__dict__)
     
         client.send(body,('localhost', config.PORT))
-        
+
 else:
     print("There is an error with your creadentials. Sign up or verificate your credentials.")
     pass

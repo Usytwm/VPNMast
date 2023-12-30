@@ -49,6 +49,13 @@ while True:
         except Exception as e :
             print(e)
             continue
+    elif command[0]=="stop":
+        if (thread is None):
+            print("VPN not started\n")
+            continue
+        vpn.stop()
+        thread.join()
+        thread = None
     elif command[0] == "create_user":
         try: 
             user_name = command[1]
@@ -58,24 +65,20 @@ while True:
             _vpn.create_user(new_user)
         except:
             print("Invalid arguments")
-
     elif command[0] == "remove_user":
         try:
             user_id = int(command[1])
             _vpn.delete_user(user_id)
         except:
             print("Invalid arguments")
-        
     elif command[0] == "get_users":
         try:
            _vpn.show_users()
             
         except:
             print("Invalid arguments")
-
     elif command[0] == "exit":
         break
-
     elif command[0] == "regulation_vlan":
         try:
             rule_name = command[1]
@@ -86,7 +89,6 @@ while True:
             _vpn.create_rule(new_rule)
         except:
             print("Invalid arguments")
-
     elif command[0] == "regulation_user":
         try:
             rule_name = command[1]
@@ -97,7 +99,6 @@ while True:
             _vpn.create_rule(new_rule)
         except:
             print("Invalid arguments")
-    
     elif command[0] == "get_rules":
         _vpn.show_rules()
             

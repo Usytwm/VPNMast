@@ -53,14 +53,17 @@ class vpn(user_crud_interface, rule_crud_interface):
     def run(self):
         for i in self.proto.run():
             try:
-                # print(self.proto)
-                body = Body.dict_to_body(json.loads(i))
-                self.send(body)
+                body = vpn_body.dict_to_body(json.loads(i))
+                usr = next((i for i in self.users if i.name == body.user and i.pwd==body.password),None)
+                if usr == None:
+                    print("User not found\n")
+                else: 
+                    self.send(body)
             except Exception as e:
                 print(e)
                 continue
 
-    def send(self, body: Body):
+    def send(self, body):
         self.proto.send(body.data, (body.dest_ip, body.dest_port))
 
     def show_users(self):
@@ -123,3 +126,23 @@ class vpn(user_crud_interface, rule_crud_interface):
             print(f"Ip: {rule.ip}")
             print(f"Port: {rule.port}")
             print("----------------------------------")
+
+class vpn_body:
+    def __init__(self, user: str, password: str, dest_ip: str, dest_port: int, data: str):
+        self.user = user
+        self.password = password
+        self.dest_ip = dest_ip
+        self.dest_port = dest_port
+        self.data = data
+
+    @staticmethod
+    def dict_to_body(dict):
+        user = dict['user']
+        password = dict['password']
+        dest_ip = dict['dest_ip']
+        dest_port = dict['dest_port']
+        data = dict['data']
+
+        value = vpn_body(user, password, dest_ip, dest_port, data)
+
+        return value

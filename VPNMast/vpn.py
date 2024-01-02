@@ -5,7 +5,6 @@ from Rule.rule import rule
 from CRUDs.user_crud import user_crud_interface
 from CRUDs.rule_crud import rule_crud_interface
 import utils
-from Proto.udp import UDP
 import os
 from udp import UDP
 

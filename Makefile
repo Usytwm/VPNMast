@@ -7,5 +7,8 @@ server:
 client:
 	python VPNMast/client.py
 
+potencia:
+	python VPNMast/square.py
+
 
 

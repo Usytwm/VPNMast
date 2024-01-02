@@ -14,3 +14,7 @@ class Body():
         value = Body(dest_ip, dest_port, data)
 
         return value
+class Address():
+    def __init__(self, _ip: str, _port: int):
+        self.ip = _ip
+        self.port = _port

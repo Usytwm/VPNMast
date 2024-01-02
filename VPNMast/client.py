@@ -3,7 +3,6 @@ from core import Body
 import utils
 import config
 import json
-import sys
 
 client = UDP(config.IP, 5001)
 user = input("user: ")

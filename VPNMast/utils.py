@@ -5,8 +5,7 @@ from Rule.rule import rule as ru
 
 
 def get_users():
-    path: str = get_dir()
-    
+    path = os.getcwd()+"/users.json" 
     if not os.path.exists(path):
         return []
     try:
@@ -19,9 +18,9 @@ def get_users():
         return []
 
 def get_user(user_name:str, password:str):
-    path:str = get_dir()
+    path = os.getcwd()+"/users.json" 
     if not os.path.exists(path):
-        return []
+        return None
     try:
         file = open(path, 'r')
         data = json.load(file)
@@ -31,17 +30,8 @@ def get_user(user_name:str, password:str):
     except:
         print("Error reading file or file is empty")
         return None
+    
 
-def get_dir():
-    path = ""
-    current_directory = os.getcwd()
-    if 'users.json' in os.listdir(current_directory):
-        path = current_directory+'/users.json'
-    else:
-        parent_directory = os.path.dirname(current_directory)
-        if 'users.json' in os.listdir(parent_directory):
-            path = parent_directory+"/users.json"
-    return path
 
 def get_rules():
     path: str = 'rules.json'
@@ -57,3 +47,4 @@ def get_rules():
         print("Error reading file or file is empty")
         return []
     
+

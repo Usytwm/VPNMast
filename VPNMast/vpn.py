@@ -6,6 +6,7 @@ from CRUDs.user_crud import user_crud_interface
 from CRUDs.rule_crud import rule_crud_interface 
 import utils
 from Proto.udp import UDP
+import os
 
 class vpn(user_crud_interface, rule_crud_interface):
    
@@ -18,7 +19,11 @@ class vpn(user_crud_interface, rule_crud_interface):
         if not any(user == new_user for user in self.users):
             new_user.id = len(self.users)
             self.users.append(new_user)
-            self.save_users()
+            try:
+                self.save_users()
+            except:
+                print("An error ocurred while creating the user")
+                return
             print(f"User {new_user.name} created")
         else:
             print(f"User {new_user.name} already exists")  
@@ -31,13 +36,17 @@ class vpn(user_crud_interface, rule_crud_interface):
             if not len(self.users)==0:
                  for i, user in enumerate(self.users):
                     user.id = i
-            self.save_users()
+            try:
+                self.save_users()
+            except:
+                print("An error ocurred while deleting the user")
+                return
             print(f"User {user_name} deleted")
         else:  
             print(f"User not found")
             
     def save_users(self):
-        path = 'users.json'
+        path = os.getcwd()+"/users.json"
         file = open(path, 'w+')
         json.dump(self.users,  file, default=lambda o: o.__dict__)
         file.close()

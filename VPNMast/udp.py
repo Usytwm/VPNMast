@@ -190,15 +190,17 @@ class UDP:
                         _address = Address(src_ip.compressed, src_port)
                         self.conexiones[
                             f"{datos.get('dest_ip')}:{datos.get('dest_port')}"
-                        ] = _address
+                        ] = [datos.get("user"), datos.get("password")], _address
                         print(f"Data: {data}\n")
                     yield data
                 else:
-                    _address = self.conexiones[f"{sender_ip}:{src_port}"]
+                    dat, _address = self.conexiones[f"{sender_ip}:{src_port}"]
                     body = Body(
                         _address.ip,
                         _address.port,
                         json.dumps({"ip": sender_ip, "port": src_port, "data": datos}),
+                        dat[0],
+                        dat[1],
                     )
                     body = json.dumps(body, default=lambda o: o.__dict__)
                     print(f"Data: {body}\n")

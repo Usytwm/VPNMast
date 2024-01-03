@@ -1,1 +1,1 @@
-[{"name": "A", "category": 0, "ip": "8000", "port": 7999, "e_id": 1}]
+[{"name": "A", "category": 0, "ip": "8000", "port": 7999, "e_id": 1}, {"name": "Para_A_Dirigido_127.0.0.3", "category": 1, "ip": "127.0.0.3", "port": 5004, "e_id": 0}, {"name": "Para_A_Dirigido_a_puerto_4040_localhost", "category": 1, "ip": "127.0.0.1", "port": 4040, "e_id": 0}, {"name": "Restrit_8000", "category": 0, "ip": "127.0.0.1", "port": 5000, "e_id": 8000}]

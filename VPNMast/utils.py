@@ -4,7 +4,7 @@ import struct
 from ipaddress import ip_address
 from User.user import user as us
 from Rule.rule import rule as ru
-
+from Rule.rules import regulation_VLAN,regulation_User
 
 def checksum(data):
     """
@@ -61,18 +61,26 @@ def get_user(user_name:str, password:str):
 
 
 def get_rules():
-    path: str = "rules.json"
-
+    path = os.getcwd()+"/rules.json"
+    #print("Hola en regla")
+    #print(path)
+    
     if not os.path.exists(path):
+        #print("no hay reglas ")
         return []
-    try:
-        file = open(path, "r")
-        data = json.load(file)
-        file.close()
-        return [ru.dict_to_rule(i) for i in data]
-    except:
-        print("Error reading file or file is empty")
-        return []
+    
+    file = open(path, "r")
+    data = json.load(file)
+    file.close()
+    #print("cantidad de reglas" + str(len(data)))
+    #print("hay reglas")
+    rules = []
+    for i in data:
+        if i['category'] == 0:
+            rules.append(regulation_VLAN.dict_to_rule(i))
+        else:
+            rules.append(regulation_User.dict_to_rule(i))
+    return rules
 
 
 

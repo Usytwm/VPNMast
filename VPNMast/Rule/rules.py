@@ -10,10 +10,23 @@ class regulation_VLAN(rule):
 
     def check(self, user: vpn_user, body: vpn_body) -> bool:
         dest_ip = '127.0.0.1' if body.dest_ip == 'localhost' else body.dest_ip
-        return user.id_vlan != self._id_vlan or dest_ip != self.ip or self.port != body.dest_port
+        """
+        print()
+        print("Revisa aqui VLAN")
+        print(f'usuario {user.name} id_vlan de la regla :{self._id_vlan} id_vlan del usuario: {user.id_vlan}')
+        
+        print(f'usuario {user.id_vlan} id_vlan de la regla :{self._id_vlan}')
+        print(int(user.id_vlan) != self._id_vlan)
+        print(f'usuario {body.dest_port} id_vlan de la regla :{self.port}')
+        print(self.port != body.dest_port)
+        print(f'usuario {dest_ip} id_vlan de la regla :{self.ip}')
+        print(dest_ip != self.ip)
+        print(user.id_vlan != self._id_vlan or dest_ip != self.ip or self.port != body.dest_port)
+        """
+        return int(user.id_vlan) != self._id_vlan or dest_ip != self.ip or self.port != body.dest_port
 
     def dict_to_rule(dict):
-        parsed_rule = to_VLAN(dict['name'], dict['ip'], dict['port'], dict['e_id'])
+        parsed_rule = regulation_VLAN(dict['name'], dict['ip'], dict['port'], dict['e_id'])
         return parsed_rule
 
 
@@ -24,8 +37,18 @@ class regulation_User(rule):
 
     def check(self, user: vpn_user, body: vpn_body) -> bool:
         dest_ip = '127.0.0.1' if body.dest_ip == 'localhost' else body.dest_ip
+        """
+        print("Revisa aqui el user")
+        print(f'usuario {user.id} id_vlan de la regla :{self._user_id}')
+        print(user.id != self._user_id)
+        print(f'usuario {body.dest_port} id_vlan de la regla :{self.port}')
+        print(dest_ip != self.ip)
+        print(f'usuario {dest_ip} id_vlan de la regla :{self.ip}')
+        print(self.port != body.dest_port)
+        print(user.id != self._user_id or dest_ip != self.ip or self.port != body.dest_port)
+        """
         return user.id != self._user_id or dest_ip != self.ip or self.port != body.dest_port
 
     def dict_to_rule(dict):
-        parsed_rule = to_User(dict['name'], dict['ip'], dict['port'], dict['e_id'])
+        parsed_rule = regulation_User(dict['name'], dict['ip'], dict['port'], dict['e_id'])
         return parsed_rule

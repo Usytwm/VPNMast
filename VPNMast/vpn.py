@@ -57,12 +57,22 @@ class vpn(user_crud_interface, rule_crud_interface):
                 usr = next((i for i in self.users if i.name == body.user and i.pwd==body.password),None)
                 if usr == None:
                     print("User not found\n")
-                else: 
+                blocked = False
+                for i in self.rules:
+                    
+                    if not i.check(usr, body):
+                        print(f'Rule {i.name} blocked to {usr.name} \n')
+                        blocked = True
+                        break
+
+                if  blocked == False:
+                    print("Se envio")
                     self.send(body)
             except Exception as e:
                 print(e)
                 continue
 
+        
     def send(self, body):
         self.proto.send(body.data, (body.dest_ip, body.dest_port))
 
@@ -112,9 +122,7 @@ class vpn(user_crud_interface, rule_crud_interface):
         file.close()
 
     def show_rules(self):
-        # print("Hi")
         for rule in self.rules:
-            # print("Hik")
             category = "VLAN Regulation" if rule.category == 0 else "User Regulation"
             e_id = (
                 f"id_vlan: {rule.e_id}"

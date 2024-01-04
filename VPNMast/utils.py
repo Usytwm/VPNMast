@@ -4,7 +4,8 @@ import struct
 from ipaddress import ip_address
 from User.user import user as us
 from Rule.rule import rule as ru
-from Rule.rules import regulation_VLAN,regulation_User
+from Rule.rules import regulation_VLAN, regulation_User
+
 
 def checksum(data):
     """
@@ -32,7 +33,7 @@ def checksum(data):
 
 
 def get_users():
-    path = os.getcwd()+"/users.json" 
+    path = os.getcwd() + "/users.json"
     if not os.path.exists(path):
         return []
     try:
@@ -44,20 +45,22 @@ def get_users():
         print("Error reading file or file is empty")
         return []
 
-def get_user(user_name:str, password:str):
-    path = os.getcwd()+"/users.json" 
+
+def get_user(user_name: str, password: str):
+    path = os.getcwd() + "/users.json"
     if not os.path.exists(path):
         return None
     try:
-        file = open(path, 'r')
+        file = open(path, "r")
         data = json.load(file)
         file.close()
-        users =  [us.to_user(i) for i in data]
-        return next((u for u in users if u.name == user_name and u.pwd == password),None)
+        users = [us.to_user(i) for i in data]
+        return next(
+            (u for u in users if u.name == user_name and u.pwd == password), None
+        )
     except:
         print("Error reading file or file is empty")
         return None
-    
 
 
 def get_rules():
@@ -65,18 +68,17 @@ def get_rules():
     
     if not os.path.exists(path):
         return []
-    
+
     file = open(path, "r")
     data = json.load(file)
     file.close()
     rules = []
     for i in data:
-        if i['category'] == 0:
+        if i["category"] == 0:
             rules.append(regulation_VLAN.dict_to_rule(i))
         else:
             rules.append(regulation_User.dict_to_rule(i))
     return rules
-
 
 
 def parse_udp(data):
@@ -180,4 +182,3 @@ def make_ipv4(proto, src_ip, dst_ip, body):
         2, "big"
     )  # Convierte el checksum en una secuencia de bytes
     return bytes(ip_header + body)
-

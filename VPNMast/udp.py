@@ -11,7 +11,7 @@ class UDP:
     def __init__(self, ip, port):
         self._ip = "127.0.0.1" if ip == "localhost" else ip
         self._port = port
-        self.__stop = False
+        self.stoped = False
         self.conexiones: dict[str, Address] = {}
         self.__connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__connection.bind((self._ip, self._port))
@@ -50,9 +50,11 @@ class UDP:
         Returns:
         data o body (str): Los datos recibidos del cliente o el cuerpo del paquete, respectivamente.
         """
-        while not self.__stop:
+        while not self.stoped:
             try:
                 data, src_addr = self.__connection.recvfrom(1024)
+                if self.stoped:
+                    break
                 proto, src_ip, dst_ip, ip_data = parse_ipv4(data)
 
                 if proto != socket.IPPROTO_UDP:
@@ -94,6 +96,7 @@ class UDP:
                             f"{datos.get('dest_ip')}:{datos.get('dest_port')}"
                         ] = [datos.get("user"), datos.get("password")], _address
                         print(f"Data: {data}\n")
+
                     yield data
                 else:
                     dat, _address = self.conexiones[f"{sender_ip}:{src_port}"]
@@ -121,7 +124,7 @@ class UDP:
         Returns:
         Ninguno
         """
-        self.__stop = True
+        self.stoped = True
 
     def socket(
         self,

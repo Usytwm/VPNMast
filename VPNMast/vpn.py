@@ -8,6 +8,7 @@ import utils
 import os
 from udp import UDP
 
+
 class vpn(user_crud_interface, rule_crud_interface):
     def __init__(self, proto: UDP) -> None:
         self.users = utils.get_users()
@@ -45,34 +46,43 @@ class vpn(user_crud_interface, rule_crud_interface):
             print(f"User not found")
 
     def save_users(self):
-        path = os.getcwd()+"/users.json"
-        file = open(path, 'w+')
-        json.dump(self.users,  file, default=lambda o: o.__dict__)
+        path = os.getcwd() + "/users.json"
+        file = open(path, "w+")
+        json.dump(self.users, file, default=lambda o: o.__dict__)
         file.close()
 
     def run(self):
         for i in self.proto.run():
             try:
                 body = vpn_body.dict_to_body(json.loads(i))
-                usr = next((i for i in self.users if i.name == body.user and i.pwd==body.password),None)
+                usr = next(
+                    (
+                        i
+                        for i in self.users
+                        if i.name == body.user and i.pwd == body.password
+                    ),
+                    None,
+                )
                 if usr == None:
                     print("User not found\n")
                 blocked = False
                 for i in self.rules:
-                    
                     if not i.check(usr, body):
-                        
-                        print(f'The message sent by user {usr.name} has been blocked by rule {i.name} \n')
+                        print(
+                            f"The message sent by user {usr.name} has been blocked by rule {i.name} \n"
+                        )
                         blocked = True
                         break
 
-                if  blocked == False:
+                if blocked == False:
                     self.send(body)
             except Exception as e:
                 print(e)
                 continue
 
-        
+    def stop(self):
+        self.proto.stop()
+
     def send(self, body):
         self.proto.send(body.data, (body.dest_ip, body.dest_port))
 
@@ -118,7 +128,7 @@ class vpn(user_crud_interface, rule_crud_interface):
                 "ip": o.ip,
                 "port": o.port,
                 "e_id": o.e_id,
-                "id" : o.id,
+                "id": o.id,
             },
         )
         file.close()
@@ -139,8 +149,11 @@ class vpn(user_crud_interface, rule_crud_interface):
                 print(f"Port: {rule.port}")
             print("----------------------------------")
 
+
 class vpn_body:
-    def __init__(self, user: str, password: str, dest_ip: str, dest_port: int, data: str):
+    def __init__(
+        self, user: str, password: str, dest_ip: str, dest_port: int, data: str
+    ):
         self.user = user
         self.password = password
         self.dest_ip = dest_ip
@@ -149,11 +162,11 @@ class vpn_body:
 
     @staticmethod
     def dict_to_body(dict):
-        user = dict['user']
-        password = dict['password']
-        dest_ip = dict['dest_ip']
-        dest_port = dict['dest_port']
-        data = dict['data']
+        user = dict["user"]
+        password = dict["password"]
+        dest_ip = dict["dest_ip"]
+        dest_port = dict["dest_port"]
+        data = dict["data"]
 
         value = vpn_body(user, password, dest_ip, dest_port, data)
 

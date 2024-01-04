@@ -81,6 +81,7 @@ class vpn(user_crud_interface, rule_crud_interface):
             print(f"User: {user.name}")
             print(f"Password: {user.pwd}")
             print(f"Id: {user.id}")
+            print(f"Id_vlan: {user.id_vlan}")
             print("----------------------------------")
 
     def create_rule(self, new_rule: rule):

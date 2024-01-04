@@ -15,6 +15,6 @@ class user:
     
     def __eq__(self, other):
         if isinstance(other, user):
-            return self.id_vlan == other.id_vlan
+            return self.name == other.name and self.pwd == other.pwd
         return False
     

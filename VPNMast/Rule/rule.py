@@ -14,3 +14,8 @@ class rule(ABC):
     @abstractmethod
     def check(self, user: user, body: Body):
         pass
+
+    def __eq__(self, other):
+        if isinstance(other, rule):
+            return self.category == other.category and self.ip == other.ip and self.port == other.port and self.e_id == other.e_id
+        return False

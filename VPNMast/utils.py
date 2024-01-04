@@ -62,18 +62,13 @@ def get_user(user_name:str, password:str):
 
 def get_rules():
     path = os.getcwd()+"/rules.json"
-    #print("Hola en regla")
-    #print(path)
     
     if not os.path.exists(path):
-        #print("no hay reglas ")
         return []
     
     file = open(path, "r")
     data = json.load(file)
     file.close()
-    #print("cantidad de reglas" + str(len(data)))
-    #print("hay reglas")
     rules = []
     for i in data:
         if i['category'] == 0:

@@ -61,12 +61,12 @@ class vpn(user_crud_interface, rule_crud_interface):
                 for i in self.rules:
                     
                     if not i.check(usr, body):
-                        print(f'Rule {i.name} blocked to {usr.name} \n')
+                        
+                        print(f'The message sent by user {usr.name} has been blocked by rule {i.name} \n')
                         blocked = True
                         break
 
                 if  blocked == False:
-                    print("Se envio")
                     self.send(body)
             except Exception as e:
                 print(e)
@@ -117,6 +117,7 @@ class vpn(user_crud_interface, rule_crud_interface):
                 "ip": o.ip,
                 "port": o.port,
                 "e_id": o.e_id,
+                "id" : o.id,
             },
         )
         file.close()
@@ -129,10 +130,12 @@ class vpn(user_crud_interface, rule_crud_interface):
                 if rule.category == 0
                 else f"user_id: {rule.e_id}"
             )
-            print(f"Rule: {rule.name}")
+            print(f"id: {rule.id}")
+            print(f"name: {rule.name}")
             print(f"Type: {category} {e_id}")
             print(f"Ip: {rule.ip}")
-            print(f"Port: {rule.port}")
+            if rule.port != 0:
+                print(f"Port: {rule.port}")
             print("----------------------------------")
 
 class vpn_body:

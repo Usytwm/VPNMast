@@ -33,10 +33,16 @@ def help():
     print("remove_user <id>: Remove a user")
     print("get_users: Get all users")
     print(
-        "regulation_vlan <rule_name> <id_vlan> <dest_ip> <dest_port>: Restrict a vlan"
+        "regulation_vlan <rule_name> <id_vlan> <dest_ip> <dest_port>: Restrict a port of an IP to a VLAN"
     )
     print(
-        "regulation_user <rule_name> <id_user> <dest_ip> <dest_port>: Restrict a user"
+        "regulation_vlan <rule_name> <id_vlan> <dest_ip>: Restrict an IP to a VLAN"
+    )
+    print(
+        "regulation_user <rule_name> <id_user> <dest_ip> <dest_port>: Restrict a port of an IP to a user"
+    )
+    print(
+        "regulation_user <rule_name> <id_user> <dest_ip> : Restrict an IP to a user"
     )
     print("remove_rule <id>: Remove a rule")
     print("get_rules: Get all rules")
@@ -91,7 +97,15 @@ while True:
             print("Invalid arguments")
     elif command[0] == "exit":
         break
-    elif command[0] == "regulation_vlan":
+
+    elif command[0] == "regulation_vlan" and len(command) == 4:
+        rule_name = command[1]
+        id_vlan = int(command[2])
+        dest_ip = command[3]
+        new_rule = regulation_VLAN(rule_name, dest_ip, 0 , id_vlan)
+        _vpn.create_rule(new_rule)
+
+    elif command[0] == "regulation_vlan" and len(command) == 5:
         try:
             rule_name = command[1]
             id_vlan = int(command[2])
@@ -101,7 +115,18 @@ while True:
             _vpn.create_rule(new_rule)
         except:
             print("Invalid arguments")
-    elif command[0] == "regulation_user":
+
+    elif command[0] == "regulation_user" and len(command) == 4:
+        try:
+            rule_name = command[1]
+            id_user = int(command[2])
+            dest_ip = command[3]
+            new_rule = regulation_User(rule_name, dest_ip, 0 , id_user)
+            _vpn.create_rule(new_rule)
+        except:
+            print("Invalid arguments")
+    
+    elif command[0] == "regulation_user" and len(command) == 5:
         try:
             rule_name = command[1]
             id_user = int(command[2])
@@ -111,6 +136,8 @@ while True:
             _vpn.create_rule(new_rule)
         except:
             print("Invalid arguments")
+
+
     elif command[0] == "get_rules":
         _vpn.show_rules()
 

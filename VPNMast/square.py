@@ -25,26 +25,28 @@ def start_server():
         print(
             f"Data received from {client_address[0]}:{client_address[1]} -> {data.decode('utf-8')}"
         )
+        try:
+            # Calcula el cuadrado del número recibido
+            number = int(data.decode("utf-8"))
+            square = number**2
 
-        # Calcula el cuadrado del número recibido
-        number = int(data.decode("utf-8"))
-        square = number**2
+            udp_data = make_udp(_port, src_port, str(square).encode("utf-8"))
 
-        udp_data = make_udp(_port, src_port, str(square).encode("utf-8"))
+            ip_data = make_ipv4(
+                socket.IPPROTO_UDP,
+                "127.0.0.1" if _ip == "localhost" else _ip,
+                src_ip,
+                udp_data,
+            )
 
-        ip_data = make_ipv4(
-            socket.IPPROTO_UDP,
-            "127.0.0.1" if _ip == "localhost" else _ip,
-            src_ip,
-            udp_data,
-        )
+            # Envía el cuadrado del número al cliente
+            server_socket.sendto(ip_data, client_address)
 
-        # Envía el cuadrado del número al cliente
-        server_socket.sendto(ip_data, client_address)
-
-        print(
-            f"Square of the number sent to {client_address[0]}:{client_address[1]} -> {square}"
-        )
+            print(
+                f"Square of the number sent to {client_address[0]}:{client_address[1]} -> {square}"
+            )
+        except:
+            print("Invalid arguments")
 
 
 if __name__ == "__main__":
